@@ -66,13 +66,13 @@ const leerInput = async (message) => {
   return desc;
 }
 
-const listadoTareasBorrar = async (tareas = []) => {
+const listarLugares = async (lugares = []) => {
 
-  const choices = tareas.map((tarea, index) => {
+  const choices = lugares.map((lugar, index) => {
     const indexNew = `${index + 1}.`.green;
     return {
-      value: tarea.id,
-      name: `${indexNew} ${tarea.desc}`,
+      value: lugar.id,
+      name: `${indexNew} ${lugar.nombre}`,
     }
   });
   // unshift para agrear de primero en el mapa de Opciones
@@ -85,7 +85,7 @@ const listadoTareasBorrar = async (tareas = []) => {
     {
       type: 'list',
       name: 'id',
-      message: 'Borrar',
+      message: 'Seleccione lugar:',
       choices
     }
   ]
@@ -132,7 +132,7 @@ export {
   inquirerMenu,
   pausa,
   leerInput,
-  listadoTareasBorrar,
+  listarLugares,
   confirmar,
   mostratListadoCheckList
 };

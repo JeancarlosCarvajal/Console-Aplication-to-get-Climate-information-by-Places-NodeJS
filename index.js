@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 
-import { inquirerMenu, leerInput, pausa } from "./helpers/inquirer.js";
+import { inquirerMenu, leerInput, listarLugares, pausa } from "./helpers/inquirer.js";
 import Busquedas from "./models/busquedas.js";
 
 // console.log(process.env.MAPBOX_KEY);
@@ -26,29 +26,47 @@ const main = async () => {
     switch (opt) {
       case '1':
         // Mostrar Mensaje
-        const ciudad = await leerInput('Buscar Ciudad: ');
+        const busqueda = await leerInput('Buscar Ciudad: ');
+
         // Buscar lugares
-        const diudades = await busquedas.ciudad(ciudad);
-        // console.log('Quiero buscar la ciudad: ', ciudad);
+        const lugares = await busquedas.ciudad(busqueda);
 
         // Seleccionar el lugar
+        const id = await listarLugares(lugares);
+        // Evita el error al tratar de buscar el cero (cancel)
+        // en el metodo find(), continua pero saltando las demas funciones
+        if (id === '0') continue;
+        // console.log({ id }); 
+        const lugarSelected = lugares.find(lugar => lugar.id === id);
+        // console.log(lugarSelected);   
+
+        // Guardr en DB
+        busquedas.agregarHistorial(lugarSelected.nombre);
+
 
         // El clima
+        const clima = await busquedas.climaLugar(
+          lugarSelected.lat,
+          lugarSelected.lng
+        );
+
 
         // Mostrar Resultados
         console.log('\nInformacion de la ciudad\n'.green);
-        console.log('Ciudad: ', ciudad);
-        console.log('Lat: ',);
-        console.log('Lng: ',);
-        console.log('Temperatura: ',);
-        console.log('Minima: ',);
-        console.log('Maxima: ',);
-
-
+        console.log('Ciudad: ', busqueda);
+        console.log('Lat: ', lugarSelected.lat);
+        console.log('Lng: ', lugarSelected.lng);
+        console.log('Temperatura: ', clima.temp);
+        console.log('Minima: ', clima.min);
+        console.log('Maxima: ', clima.max);
+        console.log('Description: ', clima.description);
 
         break;
       case '2':
-        console.log('Historial');
+        busquedas.leerHistorialCapitalizado().forEach((lugar, index) => {
+          const idx = `${(index + 1)}.`.green;
+          console.log(`${idx} ${lugar}`);
+        });
         // tareas.listadoCompleto();
         // console.log(tareas.getTaskListado);
         break;
